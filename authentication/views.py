@@ -1,30 +1,16 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.views.generic import View
 
+class Login(LoginView):
+    template_name = "auth/login.html"
+    next_page = "product_list"
+    redirect_authenticated_user = True
 
-class Login(UserPassesTestMixin, View):
-    def test_func(self):
-        return not self.request.user.is_authenticated
-
-    def handle_no_permission(self):
-        return redirect('product_list')
-
-    def get(self, request):
-        form = AuthenticationForm()
-        return render(request, "auth/login.html", { 'form': form }) 
-
-    def post(self, request):
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            return redirect("product_list")
-        return render(request, "auth/login.html", { 'form': form })
-
-
-
+# Logout View just call the logout and redirect the user. 
+# So no need to subclass any views
 class Logout(LoginRequiredMixin, View):
     def post(self, request):
        logout(request) 
