@@ -1,16 +1,16 @@
-from django.http import HttpResponseRedirect 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import View
+
 
 class Login(UserPassesTestMixin, View):
     def test_func(self):
         return not self.request.user.is_authenticated
 
     def handle_no_permission(self):
-        return HttpResponseRedirect('/products/')
+        return redirect('product_list')
 
     def get(self, request):
         form = AuthenticationForm()
@@ -20,7 +20,7 @@ class Login(UserPassesTestMixin, View):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            return HttpResponseRedirect("/products/")
+            return redirect("product_list")
         return render(request, "auth/login.html", { 'form': form })
 
 
@@ -28,5 +28,5 @@ class Login(UserPassesTestMixin, View):
 class Logout(LoginRequiredMixin, View):
     def post(self, request):
        logout(request) 
-       return HttpResponseRedirect("/auth/login/")
+       return redirect("login")
 

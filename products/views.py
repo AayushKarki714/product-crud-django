@@ -1,5 +1,4 @@
-from django.http import HttpResponseRedirect 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
 from django.views.generic import View
@@ -27,7 +26,7 @@ class ProductCreate(LoginRequiredMixin, View):
             product = form.save(commit=False)
             product.user_id = request.user.id 
             product.save()
-            return HttpResponseRedirect("/products/")
+            return redirect("product_list")
 
         return render(request, "products/create.html", { 'form': form })
 
@@ -45,7 +44,7 @@ class ProductUpdate(LoginRequiredMixin, View):
         form = ProductForm(data=request.POST, instance=product)
         if form.is_valid():
             form.save() 
-            return HttpResponseRedirect("/products/")
+            return redirect("product_list")
 
         return render(request, "products/update.html", { 'form': form })
 
@@ -55,4 +54,4 @@ class ProductDelete(LoginRequiredMixin, View):
         user_id = request.user.id
         product  = get_object_or_404(Product, pk=id, user_id=user_id)
         product.delete()
-        return HttpResponseRedirect("/products/")
+        return redirect("product_list")
